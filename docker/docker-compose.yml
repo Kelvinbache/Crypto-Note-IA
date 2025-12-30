@@ -1,0 +1,76 @@
+services:
+   crypto-note-ia:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile.python     
+    container_name: "crypto-note-iA" 
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://usuario:password@db_crypto:5432/nombre_db
+    networks:
+      - backend
+  
+   php-app:
+    build: 
+      context: ..
+      dockerfile: docker/dockerfile.php     
+    container_name: php_practice
+    volumes:
+      - ../php:/var/www/html
+    networks:
+      - backend
+
+   nginx:
+    image: nginx
+    container_name: "nginx_lab"
+    volumes:
+      - ../proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../php:/var/www/html
+    depends_on:
+      - crypto-note-ia
+      - php-app
+    networks:
+      - backend     
+
+   haproxy:
+    image: haproxy:latest
+    container_name: "haproxy_lab"
+    ports:
+      - "80:80"
+    volumes:
+      - ../proxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    command: ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]    
+    depends_on:
+      - nginx
+    networks:
+      - backend    
+   db_crypto:
+    image: postgres:16-alpine
+    container_name: db_crypto
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: cryptonote_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+   ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_service
+    volumes:
+      - ollama_storage:/root/.ollama
+    networks:
+      - backend  
+
+
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  ollama_storage:
+        

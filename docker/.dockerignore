@@ -1,0 +1,28 @@
+# Backend
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# PHP y logs
+*.log
+error_log
+.phpunit.result.cache
+
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+.git/
+.gitignore
+docker/

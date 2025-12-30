@@ -1,0 +1,7 @@
+fastapi[standard]
+uvicorn
+psycopg[binary]
+slowapi
+python-dotenv
+python-jose
+fastapi-mail
