@@ -5,8 +5,17 @@ services:
       dockerfile: docker/dockerfile.python     
     container_name: "crypto-note-iA" 
     restart: always
+    env_file:
+      - ../.env
     environment:
-      - DATABASE_URL=postgresql://usuario:password@db_crypto:5432/nombre_db
+      - API_KEYS_GEMINIS="${API_KEYS_GEMINIS}"
+      - DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@db_lab:5432/${DB_NAME}"
+      - MAIL_USERNAME="${MAIL_USERNAME}"
+      - MAIL_PASSWORD="${MAIL_PASSWORD}"
+      - MAIL_FROM="${MAIL_FROM}"
+      - MAIL_PORT="${MAIL_PORT}"
+      - MAIL_SERVER="${MAIL_SERVER}"
+
     networks:
       - backend
   
@@ -15,6 +24,7 @@ services:
       context: ..
       dockerfile: docker/dockerfile.php     
     container_name: php_practice
+    hostname: php-practice
     volumes:
       - ../php:/var/www/html
     networks:
@@ -47,24 +57,16 @@ services:
    db_crypto:
     image: postgres:16-alpine
     container_name: db_crypto
+    env_file:
+      - ../.env
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: cryptonote_db
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
-
-   ollama:
-    image: ollama/ollama:latest
-    container_name: ollama_service
-    volumes:
-      - ollama_storage:/root/.ollama
-    networks:
-      - backend  
-
-
 
 networks:
   backend:
@@ -72,5 +74,4 @@ networks:
 
 volumes:
   postgres_data:
-  ollama_storage:
         

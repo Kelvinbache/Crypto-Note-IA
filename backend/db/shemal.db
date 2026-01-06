@@ -1,0 +1,23 @@
+CREATE TABLE "users" (
+  "id_user" int PRIMARY KEY,
+  "name_user" varchar(255),
+  "email_user" varchar(255) UNIQUE,
+  "password" varchar(255),
+  "credits" int DEFAULT 3
+);
+
+CREATE TABLE "chat" (
+  "id_chat" int PRIMARY KEY,
+  "chat" text
+);
+
+CREATE TABLE "test" (
+  "id_test" int PRIMARY KEY,
+  "user_id" int,
+  "chat_id" int,
+  "status" bool DEFAULT false
+);
+
+ALTER TABLE "users" ADD FOREIGN KEY ("id_user") REFERENCES "test" ("user_id");
+
+ALTER TABLE "chat" ADD FOREIGN KEY ("id_chat") REFERENCES "test" ("chat_id");

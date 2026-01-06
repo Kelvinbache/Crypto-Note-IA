@@ -5,3 +5,5 @@ slowapi
 python-dotenv
 python-jose
 fastapi-mail
+google-genai
+python-multipart

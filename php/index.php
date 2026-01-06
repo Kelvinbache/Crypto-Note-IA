@@ -1,5 +1,6 @@
-echo "<h1>🚀 CryptoNote IA - Frontend PHP</h1>";
+<h1>🚀 CryptoNote IA - Frontend PHP</h1>;
 
+<?
 // 1. Probar conexión con la Base de Datos (Postgres)
 $host = 'db_crypto'; // Nombre del servicio en docker-compose
 $db   = 'cryptonote_db';
@@ -14,7 +15,7 @@ try {
     echo "<p style='color: red;'>❌ Error en DB: " . $e->getMessage() . "</p>";
 }
 
-$python_url = 'http://crypto-note-ia:8000/'; // Nombre del servicio en docker-compose
+$python_url = 'http://localhost/api/'; // Nombre del servicio en docker-compose
 $response = @file_get_contents($python_url);
 
 if ($response !== false) {
