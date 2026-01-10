@@ -1,4 +1,4 @@
-from IA.geminis import geminis
+from IA.geminis import ollama_consult
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -11,8 +11,8 @@ class Ask(BaseModel):
 @router_of_ask.post("/")
 async def controller_consult(data:Ask):
     try:
-       
-       consult = geminis.consult(data.promt)
+
+       consult = ollama_consult.consult(data.promt)
        return {"response": consult}
    
     except Exception as e:

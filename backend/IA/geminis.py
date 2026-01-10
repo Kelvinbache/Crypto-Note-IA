@@ -1,11 +1,9 @@
-from google import genai
+from ollama import Client
 
-from config.config import geminis 
-
-class Geminis():
-    def __init__(self, model="gemini-1.5-flash"):
-       self.client = genai.Client(api_key="AIzaSyCcputHWqujnhAhwaOkN2ra75T9YX48Quo")
-       self.model_IA = model 
+class Ollama_consult():
+    def __init__(self, model="llama3.2:latest"):
+       self.client = Client(host="http://172.17.0.1:11434", timeout=300)
+       self.model_IA = model
 
     def prepare_promt(self, prompt:str):
         return f"Actúa como un experto en criptomonedas. Analiza: {prompt}"     
@@ -15,14 +13,19 @@ class Geminis():
 
         try:
 
-           response = self.client.models.generate_content(
+           response = self.client.chat(
                 model=self.model_IA,
-                contents=prompt_user
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt_user
+                    }
+                ]
             )
            
-           return response.text
+           return response["message"]["content"]
          
         except Exception as err:
             return f"Error conectando con la IA: {str(err)}"
 
-geminis = Geminis()            
+ollama_consult = Ollama_consult()

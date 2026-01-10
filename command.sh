@@ -1,10 +1,10 @@
 #! /bin/bash
 
 echo "A cleaning will be carried out"
-docker compose -f docker/docker-compose.yml down 
+docker compose down 
 
 echo "Update the images"
-docker compose -f docker/docker-compose.yml build --no-cache crypto-note-ia
+docker compose --env-file ./.env up -d --build --remove-orphans
 
 echo "Starting the containers"
-docker compose -f docker/docker-compose.yml --env-file .env up -d
+docker compose --env-file .env up -d
