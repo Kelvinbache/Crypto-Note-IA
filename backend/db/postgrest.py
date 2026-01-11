@@ -63,6 +63,14 @@ class Postgrest_db():
              "status" bool DEFAULT false);
             """) 
             
+             cur.execute("""
+                ALTER TABLE "users" ADD FOREIGN KEY ("id_user") REFERENCES "test" ("user_id");
+            """) 
+            
+
+             cur.execute("""
+                ALTER TABLE "chat" ADD FOREIGN KEY ("id_chat") REFERENCES "test" ("chat_id");
+            """)
             return conn    
 
         except Exception:

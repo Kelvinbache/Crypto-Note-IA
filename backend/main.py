@@ -5,6 +5,6 @@ from routers.security import router_security
 
 app=FastAPI()
 
-app.include_router(router_security, tags="api/token")
-app.include_router(router_home, tags="api")
-app.include_router(router_of_ask, tags="api")
+app.include_router(router_security, prefix="/api", tags=["token"])
+app.include_router(router_home, prefix="/api", tags=["home"])
+app.include_router(router_of_ask, prefix="/api", tags=["ask"])

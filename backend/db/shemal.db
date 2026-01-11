@@ -21,3 +21,12 @@ CREATE TABLE "test" (
 ALTER TABLE "users" ADD FOREIGN KEY ("id_user") REFERENCES "test" ("user_id");
 
 ALTER TABLE "chat" ADD FOREIGN KEY ("id_chat") REFERENCES "test" ("chat_id");
+
+
+INSET INTO USERS("name_user, email_user, password") VALUES(?,?,?,?) 
+INSET INTO chat("chat") VALUES(?) 
+
+SELECT chat from chat;
+SELECT name from users
+SELECT test
+

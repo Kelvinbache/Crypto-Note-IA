@@ -8,7 +8,7 @@ class Ask(BaseModel):
     promt:str
 
 
-@router_of_ask.post("/")
+@router_of_ask.post("/ask")
 async def controller_consult(data:Ask):
     try:
 

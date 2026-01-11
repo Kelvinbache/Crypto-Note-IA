@@ -1,8 +1,11 @@
+import os
 from ollama import Client
+
+ollama_host = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
 class Ollama_consult():
     def __init__(self, model="llama3.2:latest"):
-       self.client = Client(host="http://172.17.0.1:11434", timeout=300)
+       self.client = Client(host=ollama_host, timeout=300)
        self.model_IA = model
 
     def prepare_promt(self, prompt:str):
