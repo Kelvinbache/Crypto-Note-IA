@@ -3,11 +3,10 @@ from config.config import email
 
 class Email():
     def __init__(self, config:dict):
-
-        self.mail_username=config.get("MAIL_USERNAME"),
-        self.mail_password=config.get("MAIL_PASSWORD"),
-        self.mail_from=config.get("MAIL_FROM"),
-        self.mail_port=config.get("MAIL_PORT"),
+        self.mail_username=config.get("MAIL_USERNAME")
+        self.mail_password=config.get("MAIL_PASSWORD")
+        self.mail_from=config.get("MAIL_FROM")
+        self.mail_port= int(config.get("MAIL_PORT"))
         self.mail_server=config.get("MAIL_SERVER")
 
     def connection(self):
@@ -30,12 +29,12 @@ class Email():
             return f" this is err: {err}"
 
 
-    async def create_emai(self):
-        html = """<p>Thanks for using Fastapi-mail</p> """
+    async def create_emai(self, email_to_send:str, token_user:str):
+        html = f"""<p>Thanks for using Fastapi-mail, click <a href="http://localhost/api/token/{token_user}">here</a> to confirm your email.</p> """
         try:
             message = MessageSchema(
                     subject="Confirmación de Cuenta",
-                    recipients=[self.mail_username],
+                    recipients=[email_to_send],
                     body=html,
                     subtype=MessageType.html
             )

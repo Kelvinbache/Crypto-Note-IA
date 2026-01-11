@@ -2,10 +2,10 @@
 
 <?
 // 1. Probar conexión con la Base de Datos (Postgres)
-$host = 'db_crypto'; // Nombre del servicio en docker-compose
-$db   = 'cryptonote_db';
-$user = 'admin';
-$pass = 'secret';
+$host = "db_crypto";
+$db   = "cryptonote_db";
+$user = "postgres";
+$pass = "1208";
 
 try {
     $dsn = "pgsql:host=$host;port=5432;dbname=$db;";

@@ -6,7 +6,7 @@ class Token_generator():
         self.algorithm = "HS256"
         self.secret = "secret"
     
-    def create_token(self, sub:str):
+    async def create_token(self, sub:str):
         exp = datetime.now(timezone.utc) + timedelta(minutes=10)
         iat = datetime.now(timezone.utc) 
 
@@ -17,11 +17,12 @@ class Token_generator():
             "iat":int(iat.timestamp())
             }
 
-            jwt.encode(payload, self.secret, algorithm=self.algorithm)    
+            return jwt.encode(payload, self.secret, algorithm=self.algorithm)    
+
         except Exception as e:
             return f"this is error en create token:{e}"
 
-    def decode_token(self, token):
+    async def decode_token(self, token):
         try:
             payload = jwt.decode(token=token,subject=self.secret,algorithms=self.algorithm)
             sub = payload.get("sub")
