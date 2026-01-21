@@ -14,7 +14,7 @@ class Postgrest_db():
         except Exception as err:
             print(f"this is: {err}") 
 
-    def exit_table(self):        
+    async def tables(self):        
         try:
             conn = self.connection()
             with conn.cursor() as cur:
@@ -23,63 +23,66 @@ class Postgrest_db():
                     SELECT 1 
                     FROM information_schema.tables 
                     WHERE table_schema = 'public' 
-                    AND table_name IN ('users', 'chat', 'login', 'user_test')
+                    AND table_name IN ('users', 'chat', 'test')
                     );
                     """)
             
              consult = cur.fetchone() 
-
-             self.controller(consult[0])
+             
+             if consult[0]:
+                print("the table already exists")         
+             else:   
+                 cur.execute("""
+                 CREATE TABLE IF NOT EXISTS test (
+                 id_test SERIAL PRIMARY KEY,
+                 user_id int UNIQUE,
+                 chat_id int UNIQUE,
+                 status bool DEFAULT false);
+                """) 
+                
+                 cur.execute("""
+                   CREATE TABLE IF NOT EXISTS users (
+                    id_user SERIAL PRIMARY KEY,
+                    name_user varchar(255),
+                    email_user varchar(255) UNIQUE,
+                    password varchar(255),
+                    credits int DEFAULT 3);
+                """)     
+                 
+                 cur.execute("""
+                  CREATE TABLE IF NOT EXISTS chat (
+                  id_chat SERIAL PRIMARY KEY,
+                  chat text);
     
+                """)
+                 
+                 cur.execute("""
+                       ALTER TABLE users 
+                       ADD CONSTRAINT fk_user_test 
+                       FOREIGN KEY (id_user) REFERENCES test (user_id);""") 
+        
+                 cur.execute("""
+                            ALTER TABLE chat 
+                            ADD CONSTRAINT fk_chat_test 
+                            FOREIGN KEY (id_chat) REFERENCES test (chat_id);""")
+                
+            conn.commit()
+
         except Exception as err:           
+            conn.rollback()
             print(f"this is {err}")
 
-    def create_table(self): 
-        conn = self.connection()
-        
+   
+    async def ini_db(self):
         try:
-            with conn.cursor() as cur:    
-             cur.execute("""
-               CREATE TABLE "users" (
-               "id_user" int PRIMARY KEY,
-               "name_user" varchar(255),
-               "email_user" varchar(255) UNIQUE,
-               "password" varchar(255),
-               "credits" int DEFAULT 3);
-            """)     
-             
-             cur.execute("""
-              CREATE TABLE "chat" (
-              "id_chat" int PRIMARY KEY,
-              "chat" text);
+            await self.tables()
 
-            """)
-             
-             cur.execute("""
-             CREATE TABLE "test" (
-             "id_test" int PRIMARY KEY,
-             "user_id" int,
-             "chat_id" int,
-             "status" bool DEFAULT false);
-            """) 
+            if self.conn is None:
+                return self.conn
+            else:
+                return self.conn
             
-             cur.execute("""
-                ALTER TABLE "users" ADD FOREIGN KEY ("id_user") REFERENCES "test" ("user_id");
-            """) 
-            
-
-             cur.execute("""
-                ALTER TABLE "chat" ADD FOREIGN KEY ("id_chat") REFERENCES "test" ("chat_id");
-            """)
-            return conn    
-
-        except Exception:
-           conn.rollback()
-
-    def controller(status:bool, self):
-       if(not status):     
-          print("the table already exists")
-       else:
-          self.create_table()
+        except Exception as e:
+            print(f"this is error ini_db: {e}")
  
 db = Postgrest_db()

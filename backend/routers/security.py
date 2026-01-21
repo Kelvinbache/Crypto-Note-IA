@@ -8,6 +8,7 @@ from fastapi.responses import RedirectResponse
 from dependencies.token import method_token
 from shemal import UserLoginSchema
 from dependencies.email import scheme_email
+from db.postgrest import db
 
 
 router_security = APIRouter()
@@ -18,39 +19,68 @@ router_security = APIRouter()
 @router_security.post("/login")
 async def login(userLoginSchema:UserLoginSchema):
      try:
+        conn = await db.ini_db()
+        with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT * FROM users 
+                    WHERE name_user = %s AND password = %s;
+                """, (userLoginSchema.username, userLoginSchema.password))
+                
+                user = cur.fetchone()
+                
+                if not user:
+                    return {"error": "Invalid username or password"}
+                
+                response = await method_token.create_token(sub=user[1])
 
-        response = await method_token.create_token(sub=userLoginSchema.username)
+                cur.execute("""
+                    SELECT user_id FROM test WHERE user_id = %s;
+                """, (user[0], ))
 
-        if not response:
-            return {"error": response}
-        
-        return {"message": "Login successful"}
-    
+                test_entry = cur.fetchone()
+
+                if test_entry[0] == user[0]:  
+                    return {"message": "Login successful"}
+                else:   
+                    cur.execute("""
+                        INSERT INTO test (user_id,chat_id, status) VALUES (%s, %s, %s);
+                    """, (user[0], user[0], True))
+                    
+                    conn.commit()
+
+                if not response:
+                    return {"error": response}
+                
+                return {"message": "Login successful"}
+            
      except Exception as e:
-        return {"error": f"this is error login: {e}"}
-     
+         return {"error": f"this is error login: {e}"}
+             
 
 @router_security.post("/login_up")
 async def login_up(userLoginSchema:UserLoginSchema, backround_tasks: BackgroundTasks):
     try:
+        conn = await db.ini_db()        
+        with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO users (name_user, email_user, password)
+                    VALUES (%s, %s, %s);
+                """, (userLoginSchema.username, userLoginSchema.email, userLoginSchema.password))
+                
+                conn.commit()
+
         response = await method_token.create_token(sub=userLoginSchema.username)
         
         if not response:
             return {"error": response}
         
-        email_response = await scheme_email.create_emai(email_to_send=userLoginSchema.email, token_user=response)    
-        
-        if not email_response:
-            return {"error": email_response}
-        
         backround_tasks.add_task(scheme_email.create_emai, email_to_send=userLoginSchema.email, token_user=response)
-
+        
         return {"message": "Email sent successfully"}
     
     except Exception as e:
         return {"error": f"this is error in login_up: {e}"}
     
-
 
 @router_security.get("/token/{token}")
 async def verify_token(token: str, request: Request):

@@ -2,8 +2,19 @@ from fastapi import FastAPI
 from routers.ask import router_of_ask
 from routers.home import router_home
 from routers.security import router_security
+from fastapi.middleware.cors import CORSMiddleware
+
+origin=["*"]
 
 app=FastAPI(version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origin,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"], 
+)
 
 app.include_router(router_security, prefix="/api", tags=["Security"])
 app.include_router(router_home, prefix="/api", tags=["Home"])

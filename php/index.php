@@ -1,29 +1,95 @@
-<h1>🚀 CryptoNote IA - Frontend PHP</h1>;
+<?php
 
-<?
-// 1. Probar conexión con la Base de Datos (Postgres)
-$host = "db_crypto";
-$db   = "cryptonote_db";
-$user = "postgres";
-$pass = "1208";
+header('Access-Control-Allow-Origin: http://localhost:5173');
+header('Content-Type: application/json');
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-try {
-    $dsn = "pgsql:host=$host;port=5432;dbname=$db;";
-    $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-    echo "<p style='color: green;'>✅ Conexión a PostgreSQL: Exitosa</p>";
-} catch (PDOException $e) {
-    echo "<p style='color: red;'>❌ Error en DB: " . $e->getMessage() . "</p>";
+class PythonConnection {
+ private $url;
+   
+  public function __construct($endpoit){
+     $this->url=$endpoit;
+  }
+  
+  public function sudmin($data){
+    $body = json_encode($data);
+
+    $opts = [
+    "http" => [
+        "method" => "POST",
+        "header" => "Accept: application/json\r\n" . "Content-Type: application/json\r\n",
+        "content" => $body,
+        "ignore_errors" => true,
+        "timeout" => 10
+    ]
+   ];
+   
+   $context = stream_context_create($opts);
+    return @file_get_contents($this->url, false, $context);
+  }
 }
 
-$python_url = 'http://localhost/api/'; // Nombre del servicio en docker-compose
-$response = @file_get_contents($python_url);
+$json_input = json_decode(file_get_contents('php://input'), true);
+$new_connection = new PythonConnection("http://crypto-note-ia:8000/api/login");
+echo $new_connection->sudmin($json_input);
 
-if ($response !== false) {
-    echo "<p style='color: green;'>✅ Conexión a Python IA: Exitosa</p>";
-    echo "<pre>Respuesta de la IA: " . htmlspecialchars($response) . "</pre>";
-} else {
-    echo "<p style='color: orange;'>⚠️ El backend de Python no responde (¿está encendido?)</p>";
-}
 
-phpinfo(); // Esto te confirmará que PHP está corriendo bien
+
+// if (empty($json_data)) {
+//     $dato = [
+//         "status" => "error",
+//         "message" => "No data received"
+//     ];
+ 
+//     echo json_encode($dato);
+//     exit();
+// }
+
+
+// $url = "http://crypto-note-ia:8000/api/login";
+
+
+// $opts = [
+//     "http" => [
+//         "method" => "POST",
+//         "header" => "Accept: application/json\r\n" . 
+//                     "Content-Type: application/json\r\n",
+//         "content" => $data,
+//         "ignore_errors" => true,
+//         "timeout" => 10
+//     ]
+// ];
+
+// $context = stream_context_create($opts);
+// $response = @file_get_contents($url, false, $context);
+
+// if ($response === false) {
+    
+//     $error = error_get_last();
+//     echo $error['message'];
+
+// } else {
+    
+//     $response_python = json_decode($response, true);
+    
+//     if (json_last_error() !== JSON_ERROR_NONE) {
+//         echo "JSON decode error: " . json_last_error_msg();
+//         exit;
+   
+//     } else {
+
+//         $dato = [
+//             "status" => "success",
+//             "message" => $response_python
+//         ];
+
+//         echo json_encode($dato);
+//         exit();
+//     }
+// }
+
 ?>
+
