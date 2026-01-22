@@ -5,6 +5,7 @@ class Controller_ask{
     $url = "http://crypto-note-ia:8000/api/ask";
     $body = json_encode($data);
 
+    #se puede poner globar y asi pasarlo como una variable  
     $opts = [
     "http" => [
         "method" => "POST",
