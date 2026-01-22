@@ -1,20 +1,11 @@
-# from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, Request, BackgroundTasks
+from fastapi import APIRouter, Request, BackgroundTasks
 from fastapi.responses import RedirectResponse
-
-# from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-# from dependencies.get_token_user import TokenUser
-
 from dependencies.token import method_token
 from shemal import UserLoginSchema
 from dependencies.email import scheme_email
 from db.postgrest import db
 
-
 router_security = APIRouter()
-
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-# token_user_dependency = TokenUser(Depends(oauth2_scheme))
 
 @router_security.post("/login")
 async def login(userLoginSchema:UserLoginSchema):
@@ -31,33 +22,38 @@ async def login(userLoginSchema:UserLoginSchema):
                 if not user:
                     return {"error": "Invalid username or password"}
                 
-                response = await method_token.create_token(sub=user[1])
-
-                cur.execute("""
-                    SELECT user_id FROM test WHERE user_id = %s;
-                """, (user[0], ))
-
-                test_entry = cur.fetchone()
-
-                if test_entry[0] == user[0]:  
-                    return {"message": "Login successful"}
-                else:   
+                if user:
+                    response = await method_token.create_token(sub=user[1])
+    
                     cur.execute("""
-                        INSERT INTO test (user_id,chat_id, status) VALUES (%s, %s, %s);
-                    """, (user[0], user[0], True))
+                        SELECT user_id FROM test WHERE user_id = %s;
+                    """, (user[0], ))
+    
+                    test_entry = cur.fetchone()
+    
+                    if test_entry[0] == user[0]:  
+                        return {"message": "Login successful"}
+                    else:   
+                        cur.execute("""
+                            INSERT INTO test (user_id,chat_id, status) VALUES (%s, %s, %s);
+                        """, (user[0], user[0], True))
+                        
+                        conn.commit()
+    
+                    if not response:
+                        return {"error": response}
                     
-                    conn.commit()
-
-                if not response:
-                    return {"error": response}
+                    return {"message": "Login successful"}
                 
-                return {"message": "Login successful"}
-            
+                return {"message": "User not exit"}
+                
+
+
      except Exception as e:
          return {"error": f"this is error login: {e}"}
              
 
-@router_security.post("/login_up")
+@router_security.post("/sing_up")
 async def login_up(userLoginSchema:UserLoginSchema, backround_tasks: BackgroundTasks):
     try:
         conn = await db.ini_db()        

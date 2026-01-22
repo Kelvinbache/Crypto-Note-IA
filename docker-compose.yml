@@ -53,7 +53,7 @@ services:
     image: haproxy:latest
     container_name: "haproxy_lab"
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - ./proxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     command: ["haproxy", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]    

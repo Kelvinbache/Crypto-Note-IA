@@ -16,7 +16,7 @@ class NameForm extends React.Component {
 async handleSubmit(event) {
     event.preventDefault();
 
-    await fetch("http://localhost/index.php", {
+    await fetch("http://localhost:8080/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ async handleSubmit(event) {
         <div className="bg-white p-8 rounded shadow-md w-96">
           <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={e => this.handleSubmit(e)}>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2" htmlFor="username">
                 Username
@@ -51,7 +51,7 @@ async handleSubmit(event) {
                 type="text"
                 id="username"
                 name="username"
-                value={this.state.name}
+                value={this.state.username}
                 onChange={this.handleChange}
                 className="w-full px-3 py-2 border rounded"
                 placeholder="Enter your username"
